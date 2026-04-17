@@ -2,6 +2,7 @@
 
 import { SunIcon as Sunburst, MoonIcon } from "lucide-react";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 interface FullScreenSignupProps {
   isDark: boolean;
@@ -23,7 +24,7 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
     return /^[+]?[\d\s\-().]{7,15}$/.test(value.trim());
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let valid = true;
 
@@ -44,13 +45,19 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
     setSubmitted(true);
 
     if (valid) {
-      console.log("Form submitted!");
-      console.log("Full Name:", fullName);
-      console.log("Contact Number:", contactNumber);
-      alert("Form submitted!");
-      setFullName("");
-      setContactNumber("");
-      setSubmitted(false);
+      const { error } = await supabase
+        .from("registrations")
+        .insert({ full_name: fullName, contact_number: contactNumber });
+
+      if (error) {
+        console.error("Supabase error:", error.message);
+        alert("Something went wrong. Please try again.");
+      } else {
+        alert("Registration successful!");
+        setFullName("");
+        setContactNumber("");
+        setSubmitted(false);
+      }
     }
   };
 
