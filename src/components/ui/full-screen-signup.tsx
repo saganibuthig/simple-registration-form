@@ -1,3 +1,4 @@
+
 "use client";
 
 import { SunIcon as Sunburst, MoonIcon } from "lucide-react";
@@ -14,6 +15,8 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
   const [contactNumber, setContactNumber] = useState("");
   const [fullNameError, setFullNameError] = useState("");
   const [contactNumberError, setContactNumberError] = useState("");
+  const [consentChecked, setConsentChecked] = useState(false);
+  const [consentError, setConsentError] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const validateFullName = (value: string) => {
@@ -42,6 +45,13 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
       setContactNumberError("");
     }
 
+    if (!consentChecked) {
+      setConsentError("You must agree to the privacy notice before submitting.");
+      valid = false;
+    } else {
+      setConsentError("");
+    }
+
     setSubmitted(true);
 
     if (valid) {
@@ -56,6 +66,7 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
         alert("Registration successful!");
         setFullName("");
         setContactNumber("");
+        setConsentChecked(false);
         setSubmitted(false);
       }
     }
@@ -68,20 +79,17 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
     <div className="min-h-screen flex items-center justify-center overflow-hidden p-4">
       <div className="w-full max-w-5xl rounded-3xl p-[2px] bg-gradient-to-br from-orange-500 via-purple-500 to-blue-500 shadow-xl">
       <div className="w-full relative overflow-hidden flex flex-col md:flex-row rounded-3xl">
-        <div className="w-full h-full z-2 absolute bg-linear-to-t from-transparent to-black"></div>
-        <div className="flex absolute z-2  overflow-hidden backdrop-blur-2xl ">
-          <div className="h-[40rem] z-2 w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30 overflow-hidden"></div>
-          <div className="h-[40rem] z-2 w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30]  opacity-30 overflow-hidden"></div>
-          <div className="h-[40rem] z-2 w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30]  opacity-30 overflow-hidden"></div>
-          <div className="h-[40rem] z-2 w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30]  opacity-30 overflow-hidden"></div>
-          <div className="h-[40rem] z-2 w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30]  opacity-30 overflow-hidden"></div>
-          <div className="h-[40rem] z-2 w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30]  opacity-30 overflow-hidden"></div>
-        </div>
-        <div className="w-[15rem] h-[15rem] bg-orange-500 absolute z-1 rounded-full bottom-0"></div>
-        <div className="w-[8rem] h-[5rem] bg-white absolute z-1 rounded-full bottom-0"></div>
-        <div className="w-[8rem] h-[5rem] bg-white absolute z-1 rounded-full bottom-0"></div>
-
         <div className="bg-black text-white p-8 md:p-12 md:w-1/2 relative rounded-bl-3xl  overflow-hidden">
+          <div className="w-[15rem] h-[15rem] bg-orange-500 absolute z-1 rounded-full bottom-0"></div>
+          <div className="w-[8rem] h-[5rem] bg-white absolute z-1 rounded-full bottom-0"></div>
+          <div className="flex absolute inset-0 z-2 overflow-hidden backdrop-blur-2xl">
+            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+          </div>
           <h1 className="text-2xl md:text-3xl font-medium leading-tight z-10 tracking-tight relative">
             Design and dev partner for small businesses.
           </h1>
@@ -155,6 +163,40 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
                 </p>
               )}
             </div>
+
+            {/* Consent Checkbox */}
+            <div className="flex flex-col gap-1">
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="consent"
+                  checked={consentChecked}
+                  onChange={(e) => {
+                    setConsentChecked(e.target.checked);
+                    if (e.target.checked) setConsentError("");
+                  }}
+                  className="mt-1 accent-orange-500 cursor-pointer"
+                  aria-describedby="consent-error"
+                />
+                <span className="text-xs opacity-80 leading-relaxed">
+                  I agree that my name and contact number will be collected and
+                  used solely for registration purposes, stored securely, and
+                  will not be shared with third parties.
+                </span>
+              </label>
+              {consentError && (
+                <p id="consent-error" className="text-red-500 text-xs mt-1">
+                  {consentError}
+                </p>
+              )}
+            </div>
+
+            {/* Privacy Notice */}
+            <p className="text-xs opacity-50 leading-relaxed">
+              🔒 Your data is protected under the Philippine Data Privacy Act of
+              2012. You may request access, correction, or deletion of your data
+              at any time by contacting us.
+            </p>
 
             <button
               type="submit"
