@@ -1,4 +1,3 @@
-
 "use client";
 
 import { SunIcon as Sunburst, MoonIcon } from "lucide-react";
@@ -15,8 +14,8 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
   const [contactNumber, setContactNumber] = useState("");
   const [fullNameError, setFullNameError] = useState("");
   const [contactNumberError, setContactNumberError] = useState("");
-  const [consentChecked, setConsentChecked] = useState(false);
-  const [consentError, setConsentError] = useState("");
+  const [agreed, setAgreed] = useState(false);
+  const [agreedError, setAgreedError] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const validateFullName = (value: string) => {
@@ -45,11 +44,11 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
       setContactNumberError("");
     }
 
-    if (!consentChecked) {
-      setConsentError("You must agree to the privacy notice before submitting.");
+    if (!agreed) {
+      setAgreedError("You must agree to the terms before submitting.");
       valid = false;
     } else {
-      setConsentError("");
+      setAgreedError("");
     }
 
     setSubmitted(true);
@@ -57,7 +56,12 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
     if (valid) {
       const { error } = await supabase
         .from("registrations")
-        .insert({ full_name: fullName, contact_number: contactNumber });
+        .insert({
+          full_name: fullName,
+          contact_number: contactNumber,
+          consent_given: agreed,
+          consented_at: new Date().toISOString(),
+        });
 
       if (error) {
         console.error("Supabase error:", error.message);
@@ -66,7 +70,6 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
         alert("Registration successful!");
         setFullName("");
         setContactNumber("");
-        setConsentChecked(false);
         setSubmitted(false);
       }
     }
@@ -79,23 +82,26 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
     <div className="min-h-screen flex items-center justify-center overflow-hidden p-4">
       <div className="w-full max-w-5xl rounded-3xl p-[2px] bg-gradient-to-br from-orange-500 via-purple-500 to-blue-500 shadow-xl">
       <div className="w-full relative overflow-hidden flex flex-col md:flex-row rounded-3xl">
-        <div className="bg-black text-white p-8 md:p-12 md:w-1/2 relative rounded-bl-3xl  overflow-hidden">
-          <div className="w-[15rem] h-[15rem] bg-orange-500 absolute z-1 rounded-full bottom-0"></div>
-          <div className="w-[8rem] h-[5rem] bg-white absolute z-1 rounded-full bottom-0"></div>
-          <div className="flex absolute inset-0 z-2 overflow-hidden backdrop-blur-2xl">
-            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
-            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
-            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
-            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
-            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
-            <div className="h-full w-[4rem] bg-linear-90 from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+
+        {/* Left decorative panel — all absolute elements clipped inside this */}
+        <div className="bg-black text-white p-8 md:p-12 md:w-1/2 relative rounded-bl-3xl overflow-hidden">
+          <div className="w-full h-full z-[2] absolute inset-0 bg-gradient-to-t from-transparent to-black"></div>
+          <div className="flex absolute inset-0 z-[2] overflow-hidden backdrop-blur-2xl">
+            <div className="h-full z-[2] w-[4rem] bg-gradient-to-r from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full z-[2] w-[4rem] bg-gradient-to-r from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full z-[2] w-[4rem] bg-gradient-to-r from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full z-[2] w-[4rem] bg-gradient-to-r from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full z-[2] w-[4rem] bg-gradient-to-r from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
+            <div className="h-full z-[2] w-[4rem] bg-gradient-to-r from-[#ffffff00] via-[#000000] via-[69%] to-[#ffffff30] opacity-30"></div>
           </div>
+          <div className="w-[15rem] h-[15rem] bg-orange-500 absolute z-[1] rounded-full bottom-0 left-0"></div>
+          <div className="w-[8rem] h-[5rem] bg-white absolute z-[1] rounded-full bottom-0 left-0"></div>
           <h1 className="text-2xl md:text-3xl font-medium leading-tight z-10 tracking-tight relative">
             Design and dev partner for small businesses.
           </h1>
         </div>
 
-        <div className="p-8 md:p-12 md:w-1/2 flex flex-col bg-secondary z-99 text-secondary-foreground ">
+        <div className="p-8 md:p-12 md:w-1/2 flex flex-col bg-secondary z-[99] text-secondary-foreground">
           <div className="flex flex-col items-left mb-8">
             <button
               type="button"
@@ -164,39 +170,26 @@ export const FullScreenSignup = ({ isDark, onToggleTheme }: FullScreenSignupProp
               )}
             </div>
 
-            {/* Consent Checkbox */}
-            <div className="flex flex-col gap-1">
-              <label className="flex items-start gap-2 cursor-pointer">
+            <div>
+              <label className="flex items-start gap-2 cursor-pointer text-sm">
                 <input
                   type="checkbox"
-                  id="consent"
-                  checked={consentChecked}
-                  onChange={(e) => {
-                    setConsentChecked(e.target.checked);
-                    if (e.target.checked) setConsentError("");
-                  }}
-                  className="mt-1 accent-orange-500 cursor-pointer"
-                  aria-describedby="consent-error"
+                  className="mt-0.5 accent-orange-500 cursor-pointer"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  aria-describedby="agreed-error"
                 />
-                <span className="text-xs opacity-80 leading-relaxed">
-                  I agree that my name and contact number will be collected and
-                  used solely for registration purposes, stored securely, and
-                  will not be shared with third parties.
+                <span>
+                  I agree that my name and contact number will be collected and used solely for registration purposes, stored securely, and will not be shared with third parties.
                 </span>
               </label>
-              {consentError && (
-                <p id="consent-error" className="text-red-500 text-xs mt-1">
-                  {consentError}
-                </p>
+              {agreedError && (
+                <p id="agreed-error" className="text-red-500 text-xs mt-1">{agreedError}</p>
               )}
+              <p className="text-xs opacity-60 mt-2">
+                🔒 Your data is protected under the Philippine Data Privacy Act of 2012. You may request access, correction, or deletion of your data at any time by contacting us.
+              </p>
             </div>
-
-            {/* Privacy Notice */}
-            <p className="text-xs opacity-50 leading-relaxed">
-              🔒 Your data is protected under the Philippine Data Privacy Act of
-              2012. You may request access, correction, or deletion of your data
-              at any time by contacting us.
-            </p>
 
             <button
               type="submit"
